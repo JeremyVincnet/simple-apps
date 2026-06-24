@@ -1,0 +1,6 @@
+node_modules/
+coverage/
+testing/
+sonar-oroject.properties
+package-lock.json
+README.md
