@@ -1,0 +1,48 @@
+
+pipeline {
+
+        agent {
+        label 'dev1-jeremy'
+        }
+
+
+    stages {
+        stage('Checkout SCM') {
+            steps {
+                git branch: 'main', url: 'https://github.com/JeremyVincnet/simple-apps.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh '''cd apps
+                npm install'''
+            }
+        }
+        stage('Testing') {
+            steps {
+                sh '''cd apps
+                npm test
+                npm run test:coverage'''
+            }
+        }
+        stage('Code Review') {
+            steps {
+                sh '''
+                sonar-scanner \
+                -Dsonar.projectKey=simple-apps \
+                -Dsonar.sources=. \
+                -Dsonar.host.url=http://172.23.4.113:9000 \
+                -Dsonar.token=sqp_c49052ff80445e70c2c78b8dbd6adc28eee19384
+                '''
+            }
+        }
+        stage('Deploy compose') {
+            steps {
+                sh '''
+                docker compose build
+                docker compose up -d
+                '''
+            }
+        }
+    }
+}
